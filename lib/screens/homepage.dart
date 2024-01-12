@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:rptodoapp/Controllers/todo_controller.dart';
 import 'package:rptodoapp/models/todo.dart';
 import 'package:rptodoapp/widgets/todo_item.dart';
+import 'package:get/get.dart';
 
-class HomePage extends StatefulWidget {
-   const HomePage({super.key});
+class HomePage extends StatelessWidget {
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   final todosList = ToDo.todoList();
-  final _toDoController = TextEditingController();
+  final TodoController todoController = Get.put(TodoController());
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +22,7 @@ class _HomePageState extends State<HomePage> {
         children: [
             Container(
               padding:  const EdgeInsets.symmetric(horizontal: 20,vertical: 15),
-              child: Column(
+              child: Obx(() =>Column(
                 children: [
                   Expanded(
                     child:ListView(
@@ -47,15 +43,14 @@ class _HomePageState extends State<HomePage> {
                         for (ToDo todoo in todosList)
                         TodoItem(
                           todo: todoo,
-                          onToDoChanged: _handleToDoChange,
-                          onDeleteItem: _deleteToDoItem)
-                        
+                          onToDoChanged: todoController.handleToDoChange,
+                          onDeleteItem: todoController.deleteToDoItem),
                       ],
                     ),
-            
-                  )
+                  ),
                 ],
               ),
+            ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -76,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(10)
                     ),
                     child: TextField(
-                      controller: _toDoController,
+                      controller: todoController.toDoController,
                       decoration: const InputDecoration(
                         hintText: 'Add a new todo item',
                         border: InputBorder.none
@@ -90,38 +85,21 @@ class _HomePageState extends State<HomePage> {
                     bottom: 20
                   ),
                   child: ElevatedButton(onPressed: (){
-                    _addToDoItem(_toDoController.text);
+                    todoController.addToDoItem(todoController.toDoController.text);
                   },
                   style: ElevatedButton.styleFrom(
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
-                   
                     backgroundColor: Colors.blueAccent,
                     minimumSize: const Size(60,60)
                   ), child:const Text('+',
-                    style: TextStyle(fontSize: 40,color: Colors.white)),),
-
-                )
+                    style: TextStyle(fontSize: 40,color: Colors.white),
+                    ),
+                    ),
+                ),
               ]),
-            )
+            ),
         ],
       ),
     );
-  }
-
-  void _handleToDoChange(ToDo toDo){
-    setState(() {
-      toDo.isDone = !toDo.isDone;
-    });
-  }
-  void _deleteToDoItem(String id){
-    setState(() {
-      todosList.removeWhere((item) => item.id == id);
-    });
-  }
-  void _addToDoItem(String toDo){
-    setState(() {
-      todosList.add(ToDo(id:DateTime.now().millisecondsSinceEpoch.toString(), todoText: toDo));
-    });
-    _toDoController.clear();
   }
 }

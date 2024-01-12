@@ -1,21 +1,22 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:rptodoapp/models/todo.dart';
-
 
 class TodoItem extends StatelessWidget {
   final ToDo todo;
-  final onToDoChanged;
-  final onDeleteItem;
-  const TodoItem({super.key, required this.todo,required this.onDeleteItem,required this.onToDoChanged});
-  
+  final Function(ToDo) onToDoChanged;
+  final Function(String) onDeleteItem;
+  const TodoItem({Key? key, required this.todo, required this.onDeleteItem, required this.onToDoChanged})
+   : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      child: ListTile(
+      child: Obx(()=>ListTile(
         onTap: (){
           onToDoChanged(todo);
         },
@@ -24,7 +25,7 @@ class TodoItem extends StatelessWidget {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20,vertical: 5),
         tileColor: Colors.white,
-        leading: Icon(
+        leading:Icon(
           todo.isDone? Icons.check_box : Icons.check_box_outline_blank,
         ),
         title:Text(
@@ -43,14 +44,17 @@ class TodoItem extends StatelessWidget {
               color: Colors.red,
               borderRadius: BorderRadius.circular(5),
             ),
-            child: IconButton(
+            child:IconButton(
               color: Colors.white,
               onPressed: (){
                 onDeleteItem(todo.id);
+                // onDeleteItem(todo.id?.toString() ?? '');
               }, 
               icon: const Icon(Icons.delete),
-              iconSize: 20,),
+              iconSize: 20
+              ),
           ),
+      ),
       ),
     );
   }
